@@ -1,6 +1,28 @@
 # Personal Expense Tracker API
 
+[![CI](https://github.com/dangbinhduongwork-ai/personal-expense-tracker-api/actions/workflows/ci.yml/badge.svg)](https://github.com/dangbinhduongwork-ai/personal-expense-tracker-api/actions/workflows/ci.yml)
+![.NET 10 LTS](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?logo=microsoftsqlserver&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 RESTful backend API for personal income and expense tracking, built with **ASP.NET Core 10 LTS (Controllers)**, **Entity Framework Core 10 (Code First)**, **SQL Server**, **JWT Authentication (HS256 + Rotating SHA-256 Refresh Tokens)**, **xUnit v3**, and **Testcontainers**.
+
+---
+
+## Engineering Highlights
+
+* **25 RESTful Endpoints** across Auth, Categories, Transactions, Statistics, and Health — unified behind **RFC 9457 `ProblemDetails`** (`code` + `traceId`) and `.NET 10` OpenAPI 3.1 + Swagger UI.
+* **147 Automated Tests Passing** (`50` unit + `97` integration against **real SQL Server via Testcontainers.MsSql**) with **0 compiler warnings** (`-warnaserror`) and **0 vulnerable NuGet dependencies**.
+* **SQL-Side Financial Analytics (< 10 ms on 10,000 rows):** SARGable `DateOnly` filters and `GROUP BY`/`SUM` aggregations execute directly in SQL Server, keeping `decimal(18,2)` arithmetic exact with `MidpointRounding.AwayFromZero` percentages.
+* **Defense-in-Depth Security:** JWT `sub`-only identity resolution, single-query `UserId` scoping returning `404` on foreign resources (BOLA/IDOR isolation), constant-time PBKDF2 login parity, SHA-256 rotating refresh tokens with concurrency-safe replay-theft family revocation, and `Retry-After` rate limiting on auth endpoints.
+* **Documented Architecture:** Every key trade-off is captured in [Architecture Decision Records (`docs/decisions/`)](docs/decisions/0001-tech-stack.md) and technical design specs (`docs/design/`).
+
+---
+
+## API Preview (Swagger UI)
+
+![Swagger UI Preview](docs/images/swagger-ui.png)
 
 ---
 
@@ -200,14 +222,20 @@ dotnet list package --vulnerable --include-transitive
 │   └── ExpenseTracker.IntegrationTests/# End-to-end API, SQL, Performance (10k), Security tests
 ├── postman/                           # Postman collection v2.1 + local environment
 ├── scripts/smoke.ps1                  # End-to-end HTTP smoke check script
-├── docs/                              # Design docs, ADRs, OpenAPI snapshot, deployment guide
+├── docs/                              # Design docs, ADRs, OpenAPI snapshot, screenshots, deployment guide
 ├── Dockerfile
 ├── docker-compose.yml
+├── LICENSE
 └── .github/workflows/ci.yml
 ```
+
+## Documentation & Architecture Decision Records (ADRs)
+
+* **Design Specs:** [Requirements](docs/design/requirements.md) · [Architecture](docs/design/architecture.md) · [Database ERD](docs/design/database-erd.md) · [API Specification](docs/design/api-specification.md) · [Security Design](docs/design/security.md) · [Testing Strategy](docs/design/testing.md) · [Deployment Guide](docs/DEPLOYMENT.md)
+* **ADRs:** [0001 Tech Stack](docs/decisions/0001-tech-stack.md) · [0002 Three-Project Architecture](docs/decisions/0002-three-project-architecture.md) · [0003 Direct `IAppDbContext`](docs/decisions/0003-no-repository-pattern.md) · [0004 Controllers & Manual Mapping](docs/decisions/0004-controllers-dataannotations-manual-mapping.md) · [0005 `ProblemDetails` & Plain DTOs](docs/decisions/0005-problemdetails-and-plain-dtos.md) · [0006 `DateOnly` & UTC](docs/decisions/0006-dateonly-and-utc-timestamps.md) · [0007 `int` Keys & `404` Ownership](docs/decisions/0007-int-keys-and-404-ownership.md) · [0008 JWT & Rotating Refresh Tokens](docs/decisions/0008-jwt-and-rotating-refresh-tokens.md) · [0009 OpenAPI & Swagger UI](docs/decisions/0009-openapi-and-swagger-ui.md) · [0010 Two-Layer Testing](docs/decisions/0010-testing-strategy-inmemory-and-sqlserver.md)
 
 ## Security & Roadmap Notes
 
 * Strict BOLA isolation (`404` on foreign resources, `403` on system categories), JWT HS256 pinning, SHA-256 refresh rotation & replay detection, parameterized EF LINQ, zero secrets in Git/images, `nosniff`, `Retry-After` on rate limits, and RFC 9457 `ProblemDetails`. Known trade-offs are documented in [docs/design/security.md](docs/design/security.md) §13.
 * **Planned enhancements:** monthly budgets, CSV export, and recurring transactions.
-* **License:** MIT.
+* **License:** [MIT](LICENSE).
